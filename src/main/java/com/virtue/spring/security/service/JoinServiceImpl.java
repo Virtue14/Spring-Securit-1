@@ -23,6 +23,11 @@ public class JoinServiceImpl implements JoinService {
     public void JoinProcess(JoinDTO joinDTO) {
 
         // DB에 이미 동일한 username을 가진 회원이 존재하는지 검증
+        boolean isUser = userRepository.existsByUsername(joinDTO.getUsername());
+
+        if (isUser) {
+            return;
+        }
 
         UserEntity data = new UserEntity();
         data.setUsername(joinDTO.getUsername());
