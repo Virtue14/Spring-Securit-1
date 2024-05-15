@@ -16,7 +16,7 @@ public class SecurityConfig {
 
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/", "login").permitAll()
+                        .requestMatchers("/", "login", "loginProc", "join", "joinProc").permitAll()
                         .requestMatchers("/admin").hasAnyRole("ADMIN")
                         .requestMatchers("/my/**").hasAnyRole("ADMIN", "USER")
                         .anyRequest().authenticated()   // 로그인 한 사용자만 허용
