@@ -27,7 +27,7 @@ public class JoinController {
 
     @PostMapping("/joinProc")
     public String joinProcess(JoinDTO joinDTO) {
-        System.out.println("회원가입 username = " + joinDTO.getUsername());
+        System.out.println("회원가입 username : " + joinDTO.getUsername());
 
         joinService.JoinProcess(joinDTO);
 
