@@ -4,7 +4,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 @EnableWebSecurity
@@ -31,8 +35,8 @@ public class SecurityConfig {
                 );
 
         // csrf
-        http
-                .csrf((auth) -> auth.disable());
+//        http
+//                .csrf((auth) -> auth.disable());
 
         http
                 .sessionManagement((auth) -> auth
@@ -50,6 +54,10 @@ public class SecurityConfig {
         // newSession : 로그인 시 세션 새로 생성
         // changeSessionId : 로그인 시 동일한 세션에 대한 id 변경 -> 주로 쓰임
 
+        http
+                .logout((auth) -> auth
+                        .logoutUrl("/logout"));
+
         return http.build();
 
     }
@@ -57,6 +65,24 @@ public class SecurityConfig {
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public UserDetailsService userDetailsService() {
+
+        UserDetails user1 = User.builder()
+                .username("user1")
+                .password(bCryptPasswordEncoder().encode("1234"))
+                .roles("ADMIN")
+                .build();
+
+        UserDetails user2 = User.builder()
+                .username("user2")
+                .password(bCryptPasswordEncoder().encode("1234"))
+                .roles("USER")
+                .build();
+
+        return new InMemoryUserDetailsManager(user1, user2);
     }
 
 }
