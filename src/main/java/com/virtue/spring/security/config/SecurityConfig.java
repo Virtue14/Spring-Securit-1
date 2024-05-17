@@ -2,6 +2,8 @@ package com.virtue.spring.security.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -17,27 +19,37 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     @Bean
+    public RoleHierarchy roleHierarchy() {
+        RoleHierarchyImpl hierarchy = new RoleHierarchyImpl();
+
+        hierarchy.setHierarchy("ROLE_C > ROLE_B > ROLE_A");
+
+        return hierarchy;
+    }
+
+    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         // 경로 인가
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/", "login", "loginProc", "join", "joinProc").permitAll()
-                        .requestMatchers("/admin").hasAnyRole("ADMIN")
-                        .requestMatchers("/my/**").hasAnyRole("ADMIN", "USER")
-                        .anyRequest().authenticated()   // 로그인 한 사용자만 허용
+                        .requestMatchers("/login").permitAll()
+                        .requestMatchers("/").hasAnyRole("A") // A B C
+                        .requestMatchers("/manager").hasAnyRole("B") // B C
+                        .requestMatchers("/admin").hasAnyRole("C") // C
+                        .anyRequest().authenticated()
                 );
 
         // 폼 로그인 방식
-//        http
-//                .formLogin((auth) -> auth.loginPage("/login")
-//                        .loginProcessingUrl("/loginProc")
-//                        .permitAll()
-//                );
+        http
+                .formLogin((auth) -> auth.loginPage("/login")
+                        .loginProcessingUrl("/loginProc")
+                        .permitAll()
+                );
 
         // HttpBasic
-        http
-                .httpBasic(Customizer.withDefaults());
+//        http
+//                .httpBasic(Customizer.withDefaults());
 
         // csrf
 //        http
@@ -78,13 +90,13 @@ public class SecurityConfig {
         UserDetails user1 = User.builder()
                 .username("user1")
                 .password(bCryptPasswordEncoder().encode("1234"))
-                .roles("ADMIN")
+                .roles("C")
                 .build();
 
         UserDetails user2 = User.builder()
                 .username("user2")
                 .password(bCryptPasswordEncoder().encode("1234"))
-                .roles("USER")
+                .roles("B")
                 .build();
 
         return new InMemoryUserDetailsManager(user1, user2);
