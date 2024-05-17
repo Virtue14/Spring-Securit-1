@@ -2,6 +2,7 @@ package com.virtue.spring.security.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
@@ -27,12 +28,16 @@ public class SecurityConfig {
                         .anyRequest().authenticated()   // 로그인 한 사용자만 허용
                 );
 
-        // 로그인 폼
+        // 폼 로그인 방식
+//        http
+//                .formLogin((auth) -> auth.loginPage("/login")
+//                        .loginProcessingUrl("/loginProc")
+//                        .permitAll()
+//                );
+
+        // HttpBasic
         http
-                .formLogin((auth) -> auth.loginPage("/login")
-                        .loginProcessingUrl("/loginProc")
-                        .permitAll()
-                );
+                .httpBasic(Customizer.withDefaults());
 
         // csrf
 //        http
